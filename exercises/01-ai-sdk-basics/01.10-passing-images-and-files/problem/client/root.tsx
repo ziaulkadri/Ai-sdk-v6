@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ChatInput, Message, Wrapper } from './components.tsx';
 import './tailwind.css';
+import type { FileUIPart } from 'ai';
 
 const App = () => {
   const { messages, sendMessage } = useChat({});
@@ -47,9 +48,22 @@ const App = () => {
 
           // NOTE: Make sure you handle the case where
           // `file` is null!
+
+          const filePart : FileUIPart | undefined = file
+            ? {
+                type: 'file',
+                url: await fileToDataURL(file),
+                mediaType: file.type,
+              }
+            : undefined;
           sendMessage({
-            // NOTE: 'parts' will be useful
-            text: input,
+            parts: [
+              {
+                type: 'text',
+                text: input,
+              },
+              ...(filePart ? [filePart] : []),
+            ],
           });
 
           setInput('');
